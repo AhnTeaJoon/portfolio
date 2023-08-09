@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ggiri.root.mybatis.member.GgiriFreeInsertMapper">
+	
+	<resultMap type="com.ggiri.root.member.dto.GgiriFreeInsertDTO" id="ggiri">
+		<id property="id" column="id"/>
+		<result property="memberNum" column="memberNum"/>
+		<result property="name" column="name"/>
+		<result property="introduce" column="introduce"/>
+		<result property="job" column="job"/>
+		<result property="skill" column="skill"/>
+		<result property="project_period" column="project_period"/>
+		<result property="place_of_work" column="place_of_work"/>
+		<result property="url_name" column="url_name"/>
+		<result property="insertdate" column="insertdate"/>
+	</resultMap>
+	
+	
+	<resultMap type="com.ggiri.root.complete.dto.CompleteDTO" id="complete">
+		<result property="completeNum" column="completeNum"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="skill" column="skill"/>
+		<result property="members" column="members"/>
+		<result property="tag" column="tag"/>
+		<result property="comdate" column="comdate"/>
+		<result property="comHit" column="comHit"/>
+		<result property="id" column="id"/>
+	</resultMap>
+	
+	<!-- <select id="boardAllList" resultMap="board">
+		SELECT * FROM mvc_board
+	</select> -->
+	
+	<insert id="writeSave">
+		INSERT INTO ggiriFree_insert(name, memberNum, id, introduce, job,  skill, project_period, place_of_work, url_name)
+		 VALUES(#{name}, #{memberNum},#{id} , #{introduce}, #{job}, #{skill}, #{project_period}, #{place_of_work}, #{url_name})
+    </insert>
+    
+    <select id="getBoard" resultMap="ggiri">
+		SELECT * FROM ggiriFree_insert WHERE id=#{userid}
+	</select>
+    
+    
+    <select id="selectJob" resultMap="ggiri">
+		SELECT * FROM ggiriFree_insert WHERE job=#{job} ORDER BY insertdate DESC
+	</select>
+	
+	<select id="boardAllList" resultMap="ggiri">
+		SELECT * FROM ggiriFree_insert ORDER BY insertdate DESC
+	</select>
+	
+	<!-- 무한 스크롤 sql -->
+<!-- 	<select id="boardGetFirstList" resultMap="ggiri">
+		SELECT * FROM (
+						SELECT ROW_NUMBER() OVER (ORDER BY insertdate DESC) NUM, A.*
+						FROM ggiriFree_insert A
+						ORDER BY insertdate DESC
+						)
+		WHERE NUM BETWEEN 1 AND 4
+	</select>
+	
+	<select id="boardGetList" resultMap="ggiri">
+		SELECT * FROM (
+						SELECT ROW_NUMBER() OVER (ORDER BY insertdate DESC) NUM, A.*
+						FROM ggiriFree_insert A
+						ORDER BY insertdate DESC
+						)
+		WHERE NUM BETWEEN #{startRowNum} AND #{rowCount}
+	</select> -->
+	
+	<update id="writeFreeModify">
+		UPDATE ggiriFree_insert
+		 SET introduce=#{introduce}, job=#{job}, skill=#{skill}, project_period=#{project_period}, place_of_work=#{place_of_work}, url_name=#{url_name}
+		 WHERE id =#{id}
+	</update>
+	
+	<delete id="writeFreeDelete">
+		DELETE ggiriFree_insert WHERE id =#{id}
+	</delete>
+	
+	<select id="getProject" resultMap="complete">
+      SELECT * FROM ggiriComplete WHERE members LIKE '%' || #{id} || '%'
+   </select>
+	
+	<!-- 페이지 단위로 프로젝트 목록 조회 -->
+	<select id="getGgiriList" parameterType="map" resultMap="ggiri">
+	            SELECT *
+	            FROM ggiriFree_insert
+	            ORDER BY freeNum DESC
+	</select> 
+	
+	<!-- 검색 조건에 따른 프로젝트 목록 조회 -->
+	<select id="getGgiriListBySearch" parameterType="map" resultMap="ggiri">
+	            SELECT *
+	            FROM ggiriFree_insert
+	            WHERE
+	             <choose>
+			        <when test="condition == 'name'">
+			            name LIKE '%' || #{keyword} || '%'
+			        </when>
+			        <when test="condition == 'job'">
+			            job LIKE '%' || #{keyword} || '%' 
+			        </when>
+			        <when test="condition == 'id'">
+			            id LIKE '%' || #{keyword} || '%'
+			        </when>
+			    </choose>
+	            ORDER BY freeNum DESC
+	</select> 
+
+	<delete id="freeDelete">
+		DELETE FROM ggiriFree_insert WHERE id=#{id}
+	</delete>
+	
+	<select id="ajaxMemberList" resultMap="ggiri">
+		SELECT * FROM ggiriFree_insert
+	</select>
+	
+	<select id="boardCount"	resultType="Integer">
+		SELECT COUNT(*) FROM ggiriFree_insert
+	</select>
+	
+	
+	<select id="ggiriMemberJob" resultMap="ggiri">
+		SELECT * FROM ggiriFree_insert
+	</select>
+	
+	
+	<select id="ggiriSnsJob" resultMap="ggiri">
+		SELECT * FROM ggiriFree_insert
+	</select>
+</mapper>
+
+

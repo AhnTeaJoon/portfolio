@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ggiri.root.mybatis.project.ProjectMapper">
+
+	<resultMap type="com.ggiri.root.project.dto.ProjectDTO" id="project">
+		<id property="projectNum" column="projectNum"/>
+		<result property="memberNum" column="memberNum"/>
+		<result property="title" column="title"/>
+		<result property="project" column="project"/>
+		<result property="content" column="content"/>
+		<result property="prodate" column="prodate"/>
+		<result property="proHit" column="proHit"/>
+		<result property="id" column="id"/>
+		<result property="skill" column="skill"/>
+	</resultMap>
+	
+	<!-- 프로젝트 리스트 페이지를 위한 작업 -->
+	
+	<resultMap type="com.ggiri.root.project.dto.ProjectDTO" id="projectjop">
+		<id property="projectNum" column="projectNum"/>
+		<result property="memberNum" column="memberNum"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="prodate" column="prodate"/>
+		<result property="proHit" column="proHit"/>
+		<result property="id" column="id"/>
+		<result property="like_check" column="like_check"/>
+		<result property="skill" column="skill"/>
+		<result property="job" column="job"/>
+	</resultMap>
+	
+	<resultMap type="com.ggiri.root.project.dto.ProjectRepDTO" id="reply">
+      <id property="no" column="no"/>
+      <result property="memberNum" column="memberNum"/>
+      <result property="bno" column="bno"/>
+      <result property="id" column="id"/>
+      <result property="content" column="content"/>
+      <result property="wdate" column="wdate"/>
+   </resultMap>
+   
+   
+   	<!-- 좋아요 -->
+    <resultMap type="com.ggiri.root.project.dto.GgiriBoardLikeDTO" id="like">
+   		<id property="like_no" column="like_no"/>
+   		<result property="projectNum" column="projectNum"/>
+   		<result property="id" column="id"/>
+   		<result property="like_check" column="like_check"/>
+    </resultMap>
+    
+    <!-- 좋아요 리스트 페이지를 위한 작업 -->
+	
+	<resultMap type="com.ggiri.root.project.dto.ProjectDTO" id="HeartList">
+		<id property="projectNum" column="projectNum"/>
+		<result property="memberNum" column="memberNum"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="prodate" column="prodate"/>
+		<result property="proHit" column="proHit"/>
+		<result property="id" column="id"/>
+		<result property="like_check" column="like_check"/>
+		<result property="skill" column="skill"/>
+		<result property="like_check" column="like_check"/>
+		<result property="like_no" column="like_no"/>
+	</resultMap>
+   
+   <!-- 좋아요 순위를 위한 작업 -->
+   <resultMap type="com.ggiri.root.project.dto.GgiriBoardLikeDTO" id="likeList">
+   		<id property="like_no" column="like_no"/>
+   		<result property="projectNum" column="projectNum"/>
+   		<result property="id" column="id"/>
+   		<result property="like_check" column="like_check"/>
+   		<result property="title" column="title"/>
+    </resultMap>
+   
+   <!-- 완성된 프로젝트 중복 막기위한 작업 -->
+    <resultMap type="com.ggiri.root.complete.dto.CompleteDTO" id="complete">
+		<id property="completeNum" column="completeNum"/>
+		<result property="memberNum" column="memberNum"/>		
+		<result property="projectNum" column="projectNum"/>		
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="skill" column="skill"/>
+		<result property="members" column="members"/>
+		<result property="tag" column="tag"/>
+		<result property="comdate" column="comdate"/>
+		<result property="comHit" column="comHit"/>
+		<result property="id" column="id"/>
+	</resultMap>
+	
+   <!-- 좋아요 리스트 -->
+	
+	<select id="heartList" resultMap="HeartList">
+		SELECT * FROM heart
+	</select>
+	
+	<select id="complete" resultMap="complete">
+		SELECT * FROM ggiriComplete WHERE projectNum=#{projectNum}
+	</select>
+	
+	<select id="selectHeart" resultMap="HeartList">
+		SELECT P.prodate, p.title, H.id, H.like_no, p.projectNum
+		FROM heart H
+		LEFT OUTER JOIN ggiriProject P
+		ON P.projectNum = H.projectNum
+		WHERE H.id=#{id}
+	</select>
+	
+	<select id="selectSnsHeart" resultMap="HeartList">
+		SELECT P.prodate, p.title, H.id, H.like_no, p.projectNum
+		FROM heart H
+		LEFT OUTER JOIN ggiriProject P
+		ON P.projectNum = H.projectNum
+		WHERE H.id=#{id}
+	</select>
+	
+	<!-- index 좋아요 순위 -->
+	<select id="indexRank" resultMap="likeList">
+	    <![CDATA[
+	    	SELECT gp.projectNum, gp.like_count, gp.rank, p.title
+	    	FROM (
+	      		SELECT projectNum, COUNT(*) AS like_count,
+	        	RANK() OVER (ORDER BY COUNT(*) DESC) AS rank
+	      	FROM heart
+	      		WHERE like_check = 1
+	      		GROUP BY projectNum
+	      		ORDER BY like_count DESC
+	    		) gp
+	    	JOIN ggiriProject p ON gp.projectNum = p.projectNum
+	    	WHERE gp.rank <= 3
+	  	]]>
+	</select>
+	<!-- <select id="indexRank" resultMap="like">
+		<![CDATA[
+		SELECT projectNum, like_count, rank
+		FROM(
+			SELECT projectNum, COUNT(*) AS like_count,
+			RANK() OVER(ORDER BY COUNT(*) DESC) AS RANK
+		FROM heart
+		WHERE like_check = 1
+		GROUP BY projectNum
+		ORDER BY like_check DESC
+		)WHERE RANK <=3
+		]]>
+	</select> -->
+	
+	
+	<!-- 좋아요 -->
+	
+	<insert id="insert_heart">
+		INSERT INTO heart(like_no,projectNum, id, like_check)
+		VALUES(heart_seq.nextval,#{projectNum}, #{id}, 1)
+	</insert>
+	
+	
+	<insert id="insert_sns_heart">
+		INSERT INTO heart(like_no,projectNum, id, like_check)
+		VALUES(heart_seq.nextval,#{projectNum}, #{id}, 1)
+	</insert> 
+	
+	<delete id="deleteHeart">
+		DELETE FROM heart WHERE id=#{id} AND projectNum=#{projectNum}
+	</delete>
+	
+	
+	<select id="select_heart" resultType="integer">
+		SELECT COUNT(*) FROM heart WHERE projectNum=#{projectNum} AND id=#{id}
+	</select>
+	
+	<!-- 좋아요 총 수 -->
+	<select id="select_all_heart" resultType="integer">
+		SELECT COUNT(*) FROM heart WHERE projectNum=#{projectNum}
+	</select>
+	
+	
+	<!-- 프로젝트 리스트  -->
+	<select id="selectJob" resultMap="projectjop">
+		SELECT P.*, f.job
+		FROM ggiriProject P
+		LEFT outer JOIN ggiriFree_insert F 
+		on F.id = P.id
+	</select>
+	
+	<select id="selectSnsJob" resultMap="projectjop">
+		SELECT P.*, f.job
+		FROM ggiriProject P
+		LEFT outer JOIN ggiriFree_insert F 
+		on F.id = P.id
+	</select>
+	<!-- 프로젝트 리스트 끝 -->
+	
+	
+	<select id="projectList" resultMap="project">
+		SELECT * FROM ggiriProject ORDER BY projectNum DESC
+	</select>
+	
+	<select id="projectView" resultMap="project">
+		SELECT * FROM ggiriProject WHERE projectNum=#{projectNum}
+	</select>
+	
+	<insert id="insertPro">
+		INSERT INTO ggiriProject(projectNum, memberNum, title, project, content, id, skill) 
+		VALUES(ggiriProject_seq.nextval, #{memberNum}, #{title}, #{project}, #{content}, #{id}, #{skill})
+	</insert>
+	
+	<update id="proHit">
+		UPDATE ggiriProject SET proHit=proHit+1 WHERE projectNum=#{projectNum}
+	</update>
+	
+	<update id="modify">
+		UPDATE ggiriProject SET title=#{title}, id=#{id}, skill=#{skill}, content=#{content}, project=#{project} WHERE projectNum=#{projectNum}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM ggiriProject WHERE projectNum=#{projectNum}
+	</delete>
+	
+	<select id="getProjectInfo" resultMap="project">
+		SELECT * FROM ggiriProject WHERE projectNum=#{projectNum}
+	</select>
+	
+	
+	
+	<!-- 관리자 페이지 프로젝트 삭제 -->
+	<delete id="proDelete">
+		DELETE FROM ggiriProject WHERE projectNum=#{projectNum}
+	</delete>
+	
+	<select id="adminProjectList" resultMap="project">
+		SELECT * FROM ggiriProject
+	</select>
+	
+		<!-- 전체 프로젝트 개수 조회 -->
+	<select id="getProjectCount" resultType="int">
+	    SELECT COUNT(*) FROM ggiriProject
+	</select>
+	
+	<!-- 페이지 단위로 프로젝트 목록 조회 -->
+	<select id="getProjectList" parameterType="map" resultMap="project">
+<!-- 	    SELECT *
+	    FROM (
+	        SELECT ROWNUM AS rnum, p.*
+	        FROM ( -->
+	            SELECT *
+	            FROM ggiriProject
+	            ORDER BY projectNum DESC
+<!-- 	        ) p
+	        WHERE ROWNUM &lt;= #{endRow}
+	    )
+	    WHERE rnum &gt;= #{startRow} -->
+	</select>
+	
+	<!-- 검색 조건에 따른 프로젝트 개수 조회 -->
+	<select id="getProjectCountBySearch" resultType="int">
+	    SELECT COUNT(*) FROM ggiriProject
+	    WHERE
+	    <choose>
+	        <when test="condition == 'titleContent'">
+	            (title LIKE '%' || #{keyword} || '%' OR content LIKE '%' || #{keyword} || '%')
+	        </when>
+	        <when test="condition == 'title'">
+	            title LIKE '%' || #{keyword} || '%'
+	        </when>
+	        <when test="condition == 'id'">
+	            id LIKE '%' || #{keyword} || '%'
+	        </when>
+	    </choose>
+	</select>
+	
+	<!-- 검색 조건에 따른 프로젝트 목록 조회 -->
+	<select id="getProjectListBySearch" parameterType="map" resultMap="project">
+	            SELECT *
+	            FROM ggiriProject
+	            WHERE
+	            <choose>
+	                <when test="condition == 'titleContent'">
+	                    title LIKE '%' || #{keyword} || '%' OR content LIKE '%' || #{keyword} || '%'
+	                </when>
+	                <when test="condition == 'title'">
+	                    title LIKE '%' || #{keyword} || '%'
+	                </when>
+	                <when test="condition == 'id'">
+	                    id LIKE '%' || #{keyword} || '%'
+	                </when>
+	            </choose>
+	            ORDER BY projectNum DESC
+	</select>
+	
+	<!-- 댓글 -->
+	<insert id="addReplyTest">
+		INSERT INTO ggiriReply(no, memberNum, bno, id, content)
+		VALUES(reply_seq.nextval, #{memberNum}, #{bno}, #{id}, #{content})
+	</insert>
+	
+	<select id="getRepList" resultMap="reply">
+		SELECT * FROM ggiriReply WHERE bno=#{bno} ORDER BY no DESC
+	</select>
+	
+	<select id="adminReplyList" resultMap="reply">
+		SELECT * FROM ggiriReply ORDER BY no DESC
+	</select>
+	
+	<delete id="repDelete">
+		DELETE FROM ggiriReply WHERE no=#{no}
+	</delete>
+	
+	<update id="modifyModalRep">
+		UPDATE ggiriReply SET content=#{content} WHERE no=#{no}
+	</update>
+	
+<!-- 	<select id="modalContent">
+		SELECT * FROM ggiriReply WHERE bno=#{bno}
+	</select> -->
+	
+</mapper>

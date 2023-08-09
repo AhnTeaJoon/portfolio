@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ggiri.root.mybatis.help.GgiriHelpMapper">
+
+	<resultMap type="com.ggiri.root.help.dto.GgiriHelpDTO" id="help">
+		<id property="helpNo" column="helpNo"/>
+		<result property="memberNum" column="memberNum"/>		
+		<result property="id" column="id"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="helpDate" column="helpDate"/>
+	</resultMap>
+
+	<resultMap type="com.ggiri.root.help.dto.GgiriAdminHelpDTO" id="adminHelp">
+		<id property="adminRepNo" column="adminRepNo"/>
+		<result property="adminid" column="adminid"/>		
+		<result property="helpNo" column="helpNo"/>		
+		<result property="helpMember" column="helpMember"/>
+		<result property="adminRep" column="adminRep"/>
+		<result property="adminRepDate" column="adminRepDate"/>
+	</resultMap>
+	
+	<!-- 관리자 답변 -->
+	<insert id="adminHelpReply">
+		INSERT INTO ggiriAdminHelpRep(adminRepNo, adminid, helpNo, helpMember, adminRep)
+		VALUES(adminHelpRep_seq.nextval, #{adminid}, #{helpNo}, #{helpMember}, #{adminRep})
+	</insert>
+	
+	<select id="adminRepData" resultMap="adminHelp">
+		SELECT * FROM ggiriAdminHelpRep WHERE helpNo=#{helpNo}
+	</select>
+	
+	<delete id="deleteAdminRep">
+		DELETE FROM ggiriAdminHelpRep WHERE adminRepNo=#{adminRepNo}
+	</delete>
+	
+	<update id="modifyAdminRep">
+		UPDATE ggiriAdminHelpRep SET adminRep=#{adminRep} WHERE adminRepNo=#{adminRepNo}
+	</update>
+	
+	<!-- 고객센터 -->
+	<select id="HelpList" resultMap="help">
+		SELECT * FROM ggirihelp
+	</select>
+	
+	<insert id="helpWrite">
+		INSERT INTO ggirihelp(helpNo, memberNum, id, title, content)
+		VALUES(Help_seq.nextval, #{memberNum}, #{id}, #{title}, #{content})
+	</insert>
+	
+	<select id="helpView" resultMap="help">
+		SELECT * FROM ggirihelp WHERE helpNo=#{helpNo}
+	</select>
+	
+	<update id="modify">
+		UPDATE ggirihelp SET title=#{title}, content=#{content} WHERE helpNo=#{helpNo}
+	</update>
+	
+	<delete id="helpDelete">
+		DELETE ggirihelp WHERE helpNo=#{helpNo}
+	</delete>
+	
+	<!-- 관리자 페이지 -->
+	<select id="adminHelpList" resultMap="help">
+		SELECT * FROM ggirihelp
+	</select>
+	
+	
+	
+</mapper>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ggiri.root.mybatis.complete.CompleteMapper">
+
+	<resultMap type="com.ggiri.root.complete.dto.CompleteDTO" id="complete">
+		<id property="completeNum" column="completeNum"/>
+		<result property="memberNum" column="memberNum"/>		
+		<result property="projectNum" column="projectNum"/>		
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="skill" column="skill"/>
+		<result property="members" column="members"/>
+		<result property="tag" column="tag"/>
+		<result property="comdate" column="comdate"/>
+		<result property="comHit" column="comHit"/>
+		<result property="id" column="id"/>
+	</resultMap>
+	
+	<select id="completeList" resultMap="complete">
+		SELECT * FROM ggiriComplete
+	</select>
+	
+	<select id="comView" resultMap="complete">
+		SELECT * FROM ggiriComplete WHERE completeNum=#{completeNum}
+	</select>
+	
+	<insert id="comSave">
+		INSERT INTO ggiriComplete(completeNum, memberNum, projectNum, title, content, skill, members, tag, id)
+		VALUES(ggiriComplete_seq.nextval, #{memberNum}, #{projectNum}, #{title}, #{content}, #{skill}, #{members}, #{tag}, #{id})
+	</insert>
+	
+	<update id="comHit">
+		UPDATE ggiriComplete SET comHit=comHit+1 WHERE completeNum=#{completeNum}
+	</update>
+	
+	<update id="modify">
+		UPDATE ggiriComplete SET title=#{title}, content=#{content}, skill=#{skill}, members=#{members}, tag=#{tag}
+		WHERE completeNum=#{completeNum}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM ggiriComplete WHERE completeNum=#{completeNum}
+	</delete>
+	
+	<!-- 관리자 페이지 -->
+	<select id="adminCompleteList" resultMap="complete">
+		SELECT * FROM ggiriComplete
+	</select>
+	
+	<delete id="comDelete">
+		DELETE FROM ggiriComplete WHERE completeNum=#{completeNum}
+	</delete>
+	
+</mapper>
